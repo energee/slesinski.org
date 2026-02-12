@@ -65,3 +65,44 @@ export function getPostBySlug(slug: string): {
 export function getAllSlugs(): string[] {
   return getMdxFiles().map(toSlug);
 }
+
+export function getAllTags(): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const post of getAllPosts()) {
+    for (const tag of post.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
+export function getPostsByTag(tag: string): PostMeta[] {
+  return getAllPosts().filter((post) => post.tags.includes(tag));
+}
+
+export interface Heading {
+  depth: 2 | 3;
+  text: string;
+  id: string;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+export function extractHeadings(content: string): Heading[] {
+  const headings: Heading[] = [];
+  const lines = content.split("\n");
+  for (const line of lines) {
+    const match = line.match(/^(#{2,3})\s+(.+)$/);
+    if (match) {
+      const depth = match[1].length as 2 | 3;
+      const text = match[2].trim();
+      headings.push({ depth, text, id: slugify(text) });
+    }
+  }
+  return headings;
+}

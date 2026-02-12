@@ -1,7 +1,8 @@
 import Link from "next/link";
-import type { PostMeta } from "@/lib/posts";
-import { formatDate } from "@/lib/constants";
+
 import { Tag } from "@/components/tag";
+import { formatDate } from "@/lib/constants";
+import type { PostMeta } from "@/lib/posts";
 
 interface PostCardProps {
   post: PostMeta;
@@ -26,14 +27,16 @@ export function PostCard({ post }: PostCardProps) {
         <p className="mt-1 text-sm text-muted leading-relaxed">
           {post.summary}
         </p>
-        {post.tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <Tag key={tag}>{tag}</Tag>
-            ))}
-          </div>
-        )}
       </Link>
+      {post.tags.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {post.tags.map((tag) => (
+            <Tag key={tag} href={`/tags/${tag}`}>
+              {tag}
+            </Tag>
+          ))}
+        </div>
+      )}
     </article>
   );
 }

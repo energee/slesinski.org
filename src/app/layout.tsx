@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Header } from "@/components/header";
+
 import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
 import { JsonLd } from "@/components/json-ld";
-import { personJsonLd } from "@/lib/metadata";
 import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION } from "@/lib/constants";
+import { personJsonLd } from "@/lib/metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,6 +23,11 @@ export const metadata: Metadata = {
   title: { default: SITE_TITLE, template: `%s | ${SITE_TITLE}` },
   description: SITE_DESCRIPTION,
   icons: { icon: "/favicon.svg" },
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,

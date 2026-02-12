@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import GithubSlugger from "github-slugger";
 import matter from "gray-matter";
 
 export interface PostFrontmatter {
@@ -64,4 +65,42 @@ export function getPostBySlug(slug: string): {
 
 export function getAllSlugs(): string[] {
   return getMdxFiles().map(toSlug);
+}
+
+export function getAllTags(): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const post of getAllPosts()) {
+    for (const tag of post.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
+export function getPostsByTag(tag: string): PostMeta[] {
+  return getAllPosts().filter((post) => post.tags.includes(tag));
+}
+
+export interface Heading {
+  depth: 2 | 3;
+  text: string;
+  id: string;
+}
+
+const HEADING_PATTERN = /^(#{2,3})\s+(.+)$/;
+
+export function extractHeadings(content: string): Heading[] {
+  const slugger = new GithubSlugger();
+  const headings: Heading[] = [];
+
+  for (const line of content.split("\n")) {
+    const match = line.match(HEADING_PATTERN);
+    if (match) {
+      const depth = match[1].length as 2 | 3;
+      const text = match[2].trim();
+      headings.push({ depth, text, id: slugger.slug(text) });
+    }
+  }
+
+  return headings;
 }

@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
+import { BackLink } from "@/components/back-link";
 import { JsonLd } from "@/components/json-ld";
 import { Tag } from "@/components/tag";
+import { TableOfContents } from "@/components/table-of-contents";
 import { SITE_URL, formatDate } from "@/lib/constants";
 import { mdxComponents } from "@/lib/mdx-components";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/metadata";
-import { getAllSlugs, getPostBySlug } from "@/lib/posts";
+import { getAllSlugs, getPostBySlug, extractHeadings } from "@/lib/posts";
+import { rehypeCodeWrapper } from "@/lib/rehype-code-wrapper";
 
 export const dynamicParams = false;
 
@@ -46,6 +48,7 @@ export async function generateMetadata({
 export default async function BlogPost({ params }: PageProps) {
   const { slug } = await params;
   const { meta, content } = getPostBySlug(slug);
+  const headings = extractHeadings(content);
 
   const { content: mdxContent } = await compileMDX({
     source: content,
@@ -62,6 +65,7 @@ export default async function BlogPost({ params }: PageProps) {
               keepBackground: false,
             },
           ],
+          rehypeCodeWrapper,
           [rehypeAutolinkHeadings, { behavior: "wrap" }],
         ],
       },
@@ -79,12 +83,7 @@ export default async function BlogPost({ params }: PageProps) {
         ])}
       />
 
-      <Link
-        href="/"
-        className="mb-8 inline-flex items-center gap-1 text-sm text-muted hover:text-foreground transition-colors"
-      >
-        &larr; Back
-      </Link>
+      <BackLink href="/">Back</BackLink>
 
       <article>
         <header className="mb-12">
@@ -106,11 +105,15 @@ export default async function BlogPost({ params }: PageProps) {
           {meta.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {meta.tags.map((tag) => (
-                <Tag key={tag}>{tag}</Tag>
+                <Tag key={tag} href={`/tags/${tag}`}>
+                  {tag}
+                </Tag>
               ))}
             </div>
           )}
         </header>
+
+        {headings.length > 0 && <TableOfContents headings={headings} />}
 
         <div className="prose">{mdxContent}</div>
       </article>

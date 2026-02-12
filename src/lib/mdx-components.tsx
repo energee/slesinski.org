@@ -1,5 +1,7 @@
 import type { MDXComponents } from "mdx/types";
 
+import { CodeBlock } from "@/components/code-block";
+
 export const mdxComponents: MDXComponents = {
   h2: (props) => (
     <h2 className="mt-10 mb-4 text-2xl font-semibold tracking-tight" {...props} />
@@ -43,6 +45,10 @@ export const mdxComponents: MDXComponents = {
       />
     );
   },
+  // Custom element produced by rehypeCodeWrapper
+  codeblock: (props: { raw?: string; children?: React.ReactNode }) => (
+    <CodeBlock raw={props.raw ?? ""}>{props.children}</CodeBlock>
+  ),
   table: (props) => (
     <div className="mb-4 overflow-x-auto">
       <table

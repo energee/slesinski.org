@@ -1,0 +1,68 @@
+---
+title: "Building an AEO-Optimized Blog with Next.js"
+date: "2026-02-11"
+summary: "How I built a minimal, statically-exported blog designed for Answer Engine Optimization — making content easily extractable by AI systems."
+tags: [ai, next.js, aeo]
+---
+
+## What is Answer Engine Optimization?
+
+Answer Engine Optimization (AEO) is the practice of structuring web content so AI-powered answer engines — like ChatGPT, Perplexity, and Claude — can accurately extract and cite information from your pages.
+
+While traditional SEO focuses on ranking in search results, AEO focuses on **being the source that AI systems reference** when generating answers.
+
+## Why does AEO matter?
+
+As more users turn to AI-powered search, the path from question to answer increasingly bypasses traditional search result pages. Content that is well-structured, semantically marked up, and easy to parse gets cited more often.
+
+Key principles include:
+
+- **Structured data** via JSON-LD (Article, Person, BreadcrumbList schemas)
+- **Semantic HTML** using proper heading hierarchy, `<article>`, `<time>`, `<nav>`
+- **Question-forward headings** that match how people ask questions
+- **Summary paragraphs** at the start of each section
+- **Lists and tables** for scannable, extractable data
+
+## How this blog is built
+
+This site is a statically-exported Next.js app with zero client-side JavaScript for content rendering. Here is the stack:
+
+| Layer | Tool |
+|-------|------|
+| Framework | Next.js with `output: 'export'` |
+| Content | MDX files with gray-matter frontmatter |
+| Rendering | next-mdx-remote/rsc (server components) |
+| Syntax highlighting | rehype-pretty-code + Shiki (build-time) |
+| Styling | Tailwind CSS with CSS custom properties |
+| Dark mode | `prefers-color-scheme` (no JS) |
+
+### Code example
+
+Here is how the MDX compilation pipeline works:
+
+```typescript
+const { content } = await compileMDX({
+  source: post.content,
+  components: mdxComponents,
+  options: {
+    mdxOptions: {
+      remarkPlugins: [remarkGfm],
+      rehypePlugins: [
+        rehypeSlug,
+        [rehypePrettyCode, { theme: "github-dark" }],
+        [rehypeAutolinkHeadings, { behavior: "wrap" }],
+      ],
+    },
+  },
+});
+```
+
+Everything renders at build time. The HTML output includes syntax-highlighted code blocks, proper heading IDs, and linked headings — all without shipping any JavaScript to the browser.
+
+## What comes next?
+
+Future posts will cover:
+
+- Building agentic frameworks with tool-use patterns
+- Integrating AI into existing codebases without over-engineering
+- Practical patterns for structured output and function calling

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import GithubSlugger from "github-slugger";
 import matter from "gray-matter";
 
 export interface PostFrontmatter {
@@ -86,14 +87,8 @@ export interface Heading {
   id: string;
 }
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-");
-}
-
 export function extractHeadings(content: string): Heading[] {
+  const slugger = new GithubSlugger();
   const headings: Heading[] = [];
   const lines = content.split("\n");
   for (const line of lines) {
@@ -101,7 +96,7 @@ export function extractHeadings(content: string): Heading[] {
     if (match) {
       const depth = match[1].length as 2 | 3;
       const text = match[2].trim();
-      headings.push({ depth, text, id: slugify(text) });
+      headings.push({ depth, text, id: slugger.slug(text) });
     }
   }
   return headings;

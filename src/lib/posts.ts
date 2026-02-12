@@ -87,17 +87,20 @@ export interface Heading {
   id: string;
 }
 
+const HEADING_PATTERN = /^(#{2,3})\s+(.+)$/;
+
 export function extractHeadings(content: string): Heading[] {
   const slugger = new GithubSlugger();
   const headings: Heading[] = [];
-  const lines = content.split("\n");
-  for (const line of lines) {
-    const match = line.match(/^(#{2,3})\s+(.+)$/);
+
+  for (const line of content.split("\n")) {
+    const match = line.match(HEADING_PATTERN);
     if (match) {
       const depth = match[1].length as 2 | 3;
       const text = match[2].trim();
       headings.push({ depth, text, id: slugger.slug(text) });
     }
   }
+
   return headings;
 }

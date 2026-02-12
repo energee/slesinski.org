@@ -3,10 +3,7 @@ import type { Root, Element, Text } from "hast";
 
 function extractText(node: Element | Text): string {
   if (node.type === "text") return node.value;
-  if ("children" in node) {
-    return (node.children as (Element | Text)[]).map(extractText).join("");
-  }
-  return "";
+  return (node.children as (Element | Text)[]).map(extractText).join("");
 }
 
 export function rehypeCodeWrapper() {
